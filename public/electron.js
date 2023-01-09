@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain} = require('electron')
 const storage = require('electron-json-storage');
 const path = require('path')
 const isDev = require('electron-is-dev')
-const mysql = require('mysql');
+// const mysql = require('mysql');
 let mainWindow = null;
 
 function createMainWindow () {
@@ -21,18 +21,18 @@ function createMainWindow () {
             : `file://${path.join(__dirname, 'index.html')}`
         )
 }
-try {
-    var connection = mysql.createConnection({
-        host     : 'localhost',
-        user     : 'username',
-        password : '',
-        database : 'temp'
-      });
+// try {
+//     var connection = mysql.createConnection({
+//         host     : 'localhost',
+//         user     : 'username',
+//         password : '',
+//         database : 'temp'
+//       });
       
-      connection.connect();
-} catch (error) {
-    mainWindow.webcontents.send('log',{error});
-}
+//       connection.connect();
+// } catch (error) {
+//     mainWindow.webcontents.send('log',{error});
+// }
 app.on('ready', () => {
  createMainWindow();
  try {
@@ -43,7 +43,7 @@ app.on('ready', () => {
                           });
        }  
 } catch (error) {
-    mainWindow.webcontents.send('log',{error});
+    mainWindow.webContents.send('log',{error});
 }
 
 
@@ -60,13 +60,13 @@ function newEntry(){
 ipcMain.on('save',()=>{
     let Entry=newEntry()
 try {
-    var data = storage.getSync('Data');
+    let data = storage.getSync('Data');
     data.push(Entry)
     storage.set('Data',data, function(error) {
         if (error) throw error;
       });
 } catch (error) {
-    mainWindow.webcontents.send('log',{error});
+    mainWindow.webContents.send('log',{error});
 }
 
 // var qry = 'SELECT `emp_id`,`emp_name` FROM `employee`';
@@ -80,3 +80,10 @@ try {
 //    });
 
 })
+
+
+ipcMain.on('fetch',()=>{
+
+    let data = storage.getSync('Data');
+    mainWindow.webContents.send('log',data);
+});

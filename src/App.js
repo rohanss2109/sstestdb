@@ -5,6 +5,15 @@ const { ipcRenderer } =window.require('electron');
 function App() {
   const [Timer, setTimer] = useState(false);
   const [Sec, setSec] = useState(0);
+
+  useEffect(()=>{
+    ipcRenderer.on('log',function log(e,data){
+      console.log(data);
+    })
+    return()=>{
+      ipcRenderer.removeAllListeners("log");
+    }
+  })
   useEffect(()=>{
     let interval=null;
     if(Timer){
@@ -13,11 +22,12 @@ function App() {
           setSec(Sec+1);
           let res=Sec%2
           if(res===0){
-            
             ipcRenderer.send('save',{})
           }
         }
       },1000)
+    }else{
+      ipcRenderer.send('fetch',{})
     }
     return()=>{
       clearInterval(interval);
