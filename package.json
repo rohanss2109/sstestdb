@@ -53,6 +53,7 @@
   },
   "main": "public/electron.js",
   "homepage": "./",
+  "license": "ISC",
   "author": "Snakescript",
   "description": "jdnaksndjasndk",
   "build": {
