@@ -11,7 +11,7 @@ function insert(number,date){
     db.serialize(async () => {
         // let qry= "DELETE FROM projectbilling"
         if(number&&date){
-            let qry=`INSERT INTO random ( number , date)VALUES(${number},'${date}');`
+            let qry=`INSERT INTO random ( number , timestamp)VALUES(${number},'${date}');`
             db.run(qry,function(err){
             if (err) {
                     console.error(err.message);
@@ -28,7 +28,7 @@ function create(){
     let qry=`CREATE TABLE IF NOT EXISTS random (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             number INTEGER NOT NULL UNIQUE,
-            date TEXT NOT NULL
+            timestamp TEXT NOT NULL
         );`;
         db.serialize(() => {
             db.run(qry,function(err){
@@ -128,7 +128,7 @@ app.on('ready', () => {
 
 })
 function newEntry(){
-    let num =Math.floor(Math.random() * 10000000000000);
+    let num =Math.floor(1000000000000 + Math.random() * 9000000000000)
     let date= Date.now();
     // let date= d.toString();
     return {number:num,date:date};
