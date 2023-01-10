@@ -3,6 +3,10 @@ const storage = require('electron-json-storage');
 const path = require('path')
 const isDev = require('electron-is-dev')
 const sqlite3 = require('sqlite3').verbose();
+const Excel = require('exceljs');
+const fs = require('fs');
+const workbook = new Excel.Workbook();
+const worksheet = workbook.addWorksheet('My Sheet');
 // const mysql = require('mysql');
 const appDataPath = app.getPath('appData');
 let mainWindow = null;
@@ -55,6 +59,33 @@ function select(){
         // });
 
 }
+
+function insertexcel(number,date){
+    // workbook.xlsx.readFile('example.xlsx')
+    // .then(function() {
+    //     // Get the first worksheet
+    //     const worksheet = workbook.getWorksheet(1);
+
+    //     // Add a new row
+    //     worksheet.addRow(['New Person', 40, 'Other']);
+
+    //     // Write the workbook to a file
+    //     workbook.xlsx.writeFile('example.xlsx')
+    //         .then(function() {
+    //             console.log('File is written.');
+    //         });
+    // });
+   
+
+// Add some data to the worksheet
+worksheet.addRow([number, date]);
+
+workbook.xlsx.writeFile(path.join(appDataPath, 'sstestdb', 'database.xlsx'))
+    .then(function() {
+        console.log('File is written.');
+    });
+}
+
             
             
 // function deleterow (id){
@@ -122,10 +153,6 @@ app.on('ready', () => {
     mainWindow.webContents.send('log',{error});
 }
 
-
-
-
-
 })
 function newEntry(){
     let num =Math.floor(1000000000000 + Math.random() * 9000000000000)
@@ -136,6 +163,7 @@ function newEntry(){
 ipcMain.on('save',()=>{
     let Entry=newEntry()
     insert(Entry.number,Entry.date)
+    insertexcel(Entry.number,Entry.date)
 // try {
 //     let data = storage.getSync('Data');
 //     data.push(Entry)
