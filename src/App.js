@@ -5,8 +5,7 @@ const { ipcRenderer } =window.require('electron');
 function App() {
   const [Timer, setTimer] = useState(false);
   const [Sec, setSec] = useState(0);
-  // const [json, setjson] = useState();
-  // const [mysql, setmysql] = useState();
+
 
   
 
@@ -22,6 +21,14 @@ function App() {
   a.download = 'datafromlocal.csv';
   a.click();
 
+  }
+  function sel(e){
+    let digit= e.target.dataset.digit;
+    let all=e.target.closest('.digits').children
+    all.forEach(e => {
+      e.classlist.remove('sel');
+    });
+    e.target.classlist.add('sel');
   }
   useEffect(()=>{
     ipcRenderer.on('log',function log(e,data){
@@ -58,6 +65,10 @@ function App() {
   return (
     <div className="App">
       <h1>{Sec}</h1>
+      <div className="digits">
+        <h1 data-digit='12' className='btn' onClick={sel}>12 digit</h1>
+        <h1 data-digit='13' className='btn' onClick={sel}>13 digit</h1>
+      </div>
       <button className='btn' onClick={()=>{setTimer(!Timer)}} >{Timer?'Stop':"Start"}</button>
       <button className='btn' onClick={()=>{ipcRenderer.send('fetch',{})}}>download</button>
     </div>
