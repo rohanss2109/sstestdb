@@ -14,7 +14,14 @@
 .digits{
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 .sel{
-  border: 2px solid white;
+  border: 2px solid yellow;
+}
+#path{
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }

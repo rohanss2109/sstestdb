@@ -9,8 +9,23 @@ const workbook = new Excel.Workbook();
 const worksheet = workbook.addWorksheet('My Sheet');
 // const mysql = require('mysql');
 const appDataPath = app.getPath('appData');
+console.log(appDataPath)
 let mainWindow = null;
-
+let digit=13
+function setdigit(data){
+    digit=data;
+}
+function newEntry(){
+    let num=null;
+    if(digit===13){
+        num =Math.floor(1000000000000 + Math.random() * 9000000000000)
+    }else{
+        num =Math.floor(100000000000 + Math.random() * 900000000000)
+    }
+    let date= Date.now();
+    // let date= d.toString();
+    return {number:num,date:date};
+}
 function insert(number,date){
     db.serialize(async () => {
         // let qry= "DELETE FROM projectbilling"
@@ -79,8 +94,10 @@ function insertexcel(number,date){
 
 // Add some data to the worksheet
 worksheet.addRow([number, date]);
-
-workbook.xlsx.writeFile(path.join(appDataPath, 'sstestdb', 'database.xlsx'))
+let d= new Date(Date.now());
+let file=d.toDateString()
+let name='data'+file+'.xlsx'
+workbook.xlsx.writeFile(path.join(appDataPath, 'sstestdb', name))
     .then(function() {
         console.log('File is written.');
     });
@@ -154,12 +171,7 @@ app.on('ready', () => {
 }
 
 })
-function newEntry(){
-    let num =Math.floor(1000000000000 + Math.random() * 9000000000000)
-    let date= Date.now();
-    // let date= d.toString();
-    return {number:num,date:date};
-}
+
 ipcMain.on('save',()=>{
     let Entry=newEntry()
     insert(Entry.number,Entry.date)
@@ -188,7 +200,12 @@ ipcMain.on('save',()=>{
 // }
 
 });
-
+ipcMain.on('digit',(e,data)=>{
+    setdigit(data.digit)
+})
+ipcMain.on('getpath',(e,data)=>{
+    mainWindow.webContents.send('path',appDataPath);
+})
 ipcMain.on('fetch',()=>{
 //     let data = storage.getSync('Data');
 //     mainWindow.webContents.send('local',data);

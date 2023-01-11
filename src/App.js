@@ -5,8 +5,25 @@ const { ipcRenderer } =window.require('electron');
 function App() {
   const [Timer, setTimer] = useState(false);
   const [Sec, setSec] = useState(0);
+  const [path, setpath] = useState('');
 
-
+  function sel(e){
+    if(!e.target.classList.contains('sel')){
+      ipcRenderer.send('getpath',{});
+      let digit=parseInt(e.target.dataset.digit);
+    ipcRenderer.send('digit',{digit:digit})
+    for (let i = 0; i < e.target.closest('.digits').children.length; i++) {
+      const element = e.target.closest('.digits').children[i];
+      element.classList.remove('sel');
+    }
+    e.target.classList.add('sel');
+    setTimer(true)
+    }else{
+      setTimer(false)
+      e.target.classList.remove('sel');
+    }
+    
+  }
   
 
   function download(json){
@@ -22,14 +39,16 @@ function App() {
   a.click();
 
   }
-  function sel(e){
-    let digit= e.target.dataset.digit;
-    let all=e.target.closest('.digits').children
-    all.forEach(e => {
-      e.classlist.remove('sel');
-    });
-    e.target.classlist.add('sel');
-  }
+  useEffect(()=>{
+    ipcRenderer.on('path',function log(e,data){
+    let pathdata= 'Your file is saved at '+data+'/sstestdb/';
+      setpath(pathdata);
+    })
+   
+    return()=>{
+      ipcRenderer.removeAllListeners("path");
+    }
+  })
   useEffect(()=>{
     ipcRenderer.on('log',function log(e,data){
       // download(data);
@@ -66,11 +85,12 @@ function App() {
     <div className="App">
       <h1>{Sec}</h1>
       <div className="digits">
-        <h1 data-digit='12' className='btn' onClick={sel}>12 digit</h1>
-        <h1 data-digit='13' className='btn' onClick={sel}>13 digit</h1>
+        <h4 data-digit='12' className='btn' onClick={sel}>12 digit</h4>
+        <h4 data-digit='13' className='btn' onClick={sel}>13 digit</h4>
       </div>
-      <button className='btn' onClick={()=>{setTimer(!Timer)}} >{Timer?'Stop':"Start"}</button>
-      <button className='btn' onClick={()=>{ipcRenderer.send('fetch',{})}}>download</button>
+      {/* <button className='btn' onClick={()=>{setTimer(!Timer)}} >{Timer?'Stop':"Start"}</button> */}
+      {/* <button className='btn' onClick={()=>{ipcRenderer.send('fetch',{})}}>download</button> */}
+      <h6 id='path'>{path}</h6>
     </div>
   );
 }
