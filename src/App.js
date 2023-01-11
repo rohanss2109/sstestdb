@@ -15,16 +15,40 @@ function App() {
     for (let i = 0; i < e.target.closest('.digits').children.length; i++) {
       const element = e.target.closest('.digits').children[i];
       element.classList.remove('sel');
+      element.dataset.sel=false;
     }
     e.target.classList.add('sel');
-    setTimer(true)
+    e.target.dataset.sel=true
+
     }else{
-      setTimer(false)
+
       e.target.classList.remove('sel');
     }
     
   }
-  
+  function start(e){
+    e.preventDefault();
+    let sel=false;
+    // let digits=
+    console.log(document.getElementById('digits').children);
+    for (let i = 0; i < document.getElementById('digits').children.length; i++) {
+      const element = document.getElementById('digits').children[i];
+      let temp=element.classList.contains('sel');
+      if(temp===true){
+        sel=true;
+      }
+    }
+    if(!sel){
+      if(Timer){
+        alert('Please select a digit first')
+      }
+    }
+    if(sel){
+      setTimer(true);
+    }else{
+      setTimer(false);
+    }
+  }
 
   function download(json){
   const columns = Object.keys(json[0]);
@@ -84,11 +108,11 @@ function App() {
   return (
     <div className="App">
       <h1>{Sec}</h1>
-      <div className="digits">
+      <div id='digits' className="digits">
         <h4 data-digit='12' className='btn' onClick={sel}>12 digit</h4>
         <h4 data-digit='13' className='btn' onClick={sel}>13 digit</h4>
       </div>
-      {/* <button className='btn' onClick={()=>{setTimer(!Timer)}} >{Timer?'Stop':"Start"}</button> */}
+      <button className='btn' onClick={start} >{Timer?'Stop':"Start"}</button>
       {/* <button className='btn' onClick={()=>{ipcRenderer.send('fetch',{})}}>download</button> */}
       <h6 id='path'>{path}</h6>
     </div>
