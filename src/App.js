@@ -89,11 +89,11 @@ return()=>{
       </div>
       <button className='btn' onClick={start} >{Timer?'Stop':"Start"}</button>
       {(path&&digit&&Sec>2)?
-      <button className='btn' onClick={()=>{ipcRenderer.send('open',{})}}>open</button>
+      <button className='btn' onClick={()=>{ipcRenderer.send('open',{})}}>show file</button>
       :<></>}
       <h6 id='path'>{path}</h6>
       {path?
-      <h6 id='changebtn' className='btn' onClick={()=>{document.getElementsByClassName('sel')[0].click(); setpath(false);ipcRenderer.send('change',{})}}>change path</h6>
+      <h6 id='changebtn' className='btn' onClick={()=>{document.getElementsByClassName('sel')[0].click(); setpath(false);ipcRenderer.send('change',{})}}>choose directory</h6>
       :<></>
       }
     </div>
