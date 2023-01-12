@@ -92,6 +92,10 @@ return()=>{
       <button className='btn' onClick={()=>{ipcRenderer.send('open',{})}}>open</button>
       :<></>}
       <h6 id='path'>{path}</h6>
+      {path?
+      <h6 id='changebtn' className='btn' onClick={()=>{document.getElementsByClassName('sel')[0].click(); setpath(false);ipcRenderer.send('change',{})}}>change path</h6>
+      :<></>
+      }
     </div>
   );
 }

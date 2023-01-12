@@ -155,3 +155,24 @@ ipcMain.on('open', (e, data) => {
     let file = 'data' + d.toDateString() + '.xlsx'
     shell.showItemInFolder(path.join(appDataPath,file))
 })
+ipcMain.on('change', async(e, data) => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory']
+    })
+    if (result.filePaths.length > 0) {
+        appDataPath = result.filePaths[0];
+        mainWindow.webContents.send('path', appDataPath);
+        db.serialize(async () => {
+            if (appDataPath) {
+                let qry = `UPDATE pathdata SET path='${appDataPath}';`
+                await db.run(qry, function (err) {
+                    if (err) {
+                        console.error(err.message);
+                    }
+                    console.log("saved Locally");
+                    mainWindow.webContents.send("log", 'saved')
+                });
+            }
+        });
+    }
+})
