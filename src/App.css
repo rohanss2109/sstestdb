@@ -1,3 +1,6 @@
+body{
+  font-family: 'Times New Roman', serif;
+}
 .App {
   text-align: center;
 }
@@ -24,11 +27,10 @@
 
 
 
-
 /* CSS */
 .startbtn{
   background-image: linear-gradient(#42A1EC, #0070C9);
-  border: 1px solid #0077CC;
+  border: 1px solid #7695af;
   border-radius: 4px;
   color: #FFFFFF;
   font-size: 17px;
@@ -52,33 +54,64 @@
 }
 .all-buttons h2 {
   color: #0070C9;
-  font-family: Georgia, serif;
-}
-.startbtn:hover {
-  background-image: linear-gradient(#51A9EE, #147BCD);
-  border-color: #1482D0;
-  text-decoration: none;
+ 
 }
 
-.startbtn:active {
-  background-image: linear-gradient(#3D94D9, #0067B9);
-  border-color: #006DBC;
-  outline: none;
-}
 
-.startbtn:focus {
-  box-shadow: none;
-  outline: none;
-}
+
 h4.btn.startbtn.sel {
-  background: linear-gradient(#a3caea, #55a9ec);
-  border: 1px solid #90b3c1bf;
+  background: #418641;
+  border: 1px solid #418641;
 }
 .stopbtn {
-  background: linear-gradient(#a3caea, #55a9ec);
-  border: 1px solid #90b3c1bf;
+  background: #418641;
+  border: 1px solid #418641;
 }
 .directory-text #changebtn {
   width: 150px;
   margin: 0 auto;
+}
+.directory-text .dis-dir {
+  width: 150px;
+  margin: 0 auto;
+  background: #cacaca;
+  border-color: #cacaca;
+}
+.thirteendigit {
+  background-color: #7695af;
+  background-image: none;
+}
+.twelve-digit {
+  background: #42A1EC;
+  border-color: #55a9ec;
+}
+
+.notification {
+  background: #fff;
+  width: 100%;
+  text-align: center;
+  max-width: 225px;
+  border-radius: 2px;
+  padding: 2px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  background: #eaecea;
+  margin:0 auto;
+  left: 50%;
+  transform: translate(-50%,-7px);
+  position: absolute;
+  display: none;
+}
+.show{
+  display: block;
+}
+.notification p {
+  margin: 0px;
+  color: #000;
+  font-weight: 500;
+  font-size: 12px;
+}
+.number-count p {
+  color: #0070c9;
+  font-family: Georgia, serif;
+  font-weight: 800;
 }

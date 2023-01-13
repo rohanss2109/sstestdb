@@ -26,7 +26,6 @@ function createMainWindow() {
         maximizable:false,
         webPreferences: {
             nodeIntegration: true,
-            preload: path.join(__dirname, 'preload.js')
         }
     })
     mainWindow.loadURL(
@@ -39,7 +38,7 @@ function createMainWindow() {
 app.on('ready', () => {
     createMainWindow();
     console.log(filename)
-    Menu.setApplicationMenu(null)
+    // Menu.setApplicationMenu(null)
 })
 
 let db = new sqlite3.Database(path.join(mydata, appname, 'database.db'), (err) => {
@@ -75,12 +74,11 @@ function setdigit(data) {
 function newEntry() {
     let num = null;
     if (digit === 13) {
-        num = Math.floor(1000000000000 + Math.random() * 9000000000000)
+        num = Math.floor((Math.random()*10000000000000)).toString().padStart(13,'0');
     } else {
-        num = Math.floor(100000000000 + Math.random() * 900000000000)
+        num = Math.floor((Math.random()*1000000000000)).toString().padStart(12,'0');
     }
     let date = Date.now();
-    // let date= d.toString();
     return { number: num, date: date };
 }
 async function getpathfromuser(){
@@ -125,7 +123,7 @@ function insertexcel(number) {
         worksheet.addRow([number]);
         workbook.xlsx.writeFile(path.join(appDataPath, filename))
             .then(function () {
-                console.log('File is written.');
+                mainWindow.webContents.send('saved',{})
             });
     }else{
     workbook.xlsx.readFile(path.join(appDataPath, filename))
@@ -141,8 +139,23 @@ function insertexcel(number) {
 
 
 ipcMain.on('save', () => {
+    try {
+        if (fs.existsSync(path.join(appDataPath, filename))) {
+               newfile=false
+        }else{
+            worksheet.addRow(["Number"])
+            newfile=true
+        }
+    } catch(err) {
+        console.error(err)
+    }
     let Entry = newEntry()
     insertexcel(Entry.number)
+    workbook.xlsx.readFile(path.join(appDataPath, filename))
+    .then(function() {
+        var oldworksheet = workbook.getWorksheet(1);
+        mainWindow.webContents.send('count',{count:oldworksheet.rowCount})
+    })
 });
 ipcMain.on('digit', (e, data) => {
     setdigit(data.digit)

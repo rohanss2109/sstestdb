@@ -1,110 +1,148 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-const { ipcRenderer } =window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 function App() {
   const [Timer, setTimer] = useState(false);
   const [Sec, setSec] = useState(0);
+  const [num, setnum] = useState(0);
   const [path, setpath] = useState('');
   const [digit, setdigit] = useState(false);
 
-function sel(e){
-  if(!e.target.classList.contains('sel')){
-    ipcRenderer.send('checkpath',{});
-    let digiti=parseInt(e.target.dataset.digit);
-  ipcRenderer.send('digit',{digit:digiti})
-  for (let i = 0; i < e.target.closest('.digits').children.length; i++) {
-    const element = e.target.closest('.digits').children[i];
-    element.classList.remove('sel');
-  }
-  e.target.classList.add('sel');
-  }else{
-    e.target.classList.remove('sel');
-    setdigit(false)
-    setTimer(false);
-    document.getElementById('thebtn').classList.remove('stopbtn');
-  }
-  
-}
-function start(e){
-  e.preventDefault();
-  if(digit){
-    if(Timer){
+  function sel(e) {
+    if (!e.target.classList.contains('sel')) {
+      ipcRenderer.send('checkpath', {});
+      let digiti = parseInt(e.target.dataset.digit);
+      ipcRenderer.send('digit', { digit: digiti })
+      for (let i = 0; i < e.target.closest('.digits').children.length; i++) {
+        const element = e.target.closest('.digits').children[i];
+        element.classList.remove('sel');
+      }
+      e.target.classList.add('sel');
+    } else {
+      e.target.classList.remove('sel');
+      setdigit(false)
       setTimer(false);
       document.getElementById('thebtn').classList.remove('stopbtn');
-    }else{
-      setTimer(true);
-      document.getElementById('thebtn').classList.add('stopbtn');
+      document.getElementById('changebtn').classList.remove('dis-dir')
     }
-  }else{
-    alert('Please select a digit first')
+
   }
-}
-
-
-useEffect(()=>{
-  ipcRenderer.on('path',function log(e,data){
-  let pathdata= 'Your file is saved at '+data;
-    setpath(pathdata);
-    setdigit(true);
-  })
-  
-  return()=>{
-    ipcRenderer.removeAllListeners("path");
-  }
-})
-
-useEffect(()=>{
-  ipcRenderer.on('log',function log(e,data){
-    console.log(data);
-  })
-  return()=>{
-    ipcRenderer.removeAllListeners("log");
-  }
-})
-
-
-useEffect(()=>{
-let interval=null;
-if(Timer){
-  interval=setInterval(()=>{
+  function start(e) {
+    e.preventDefault();
     if(Timer){
-      setSec(Sec+1);
-      let res=Sec%2
-      if(res===0){
-        ipcRenderer.send('save',{})
-      }
+     if(!window.confirm('are you sure??')){
+      return;
+     }
     }
-  },1000)
-}else{
-  // ipcRenderer.send('fetch',{})
-}
-return()=>{
-  clearInterval(interval);
-}
-})
-  return (
-    <div className="App button-main-div">
-      
-    <div class="all-buttons">
-    <h2>Kunwarsa</h2>
-      <div id='digits' className="digits">
-        <h4 data-digit='12' className='btn startbtn' onClick={sel}>12 digit</h4>
-        <h4 data-digit='13' className='btn startbtn' onClick={sel}>13 digit</h4>
-      </div>
-      <button id='thebtn' className='btn startbtn' onClick={start} >{Timer?'Stop':"Start"}</button>
-      {(path&&digit&&Sec>2)?
-      <button className='btn startbtn' onClick={()=>{ipcRenderer.send('open',{})}}>Open file</button>
-      :<></>}
-      <div class="directory-text">
-      <h6 id='path'>{path}</h6>
-      {path?
-      <h6 id='changebtn' className='btn startbtn' onClick={()=>{document.getElementsByClassName('sel')[0].click();setSec(0); setdigit(false); setTimer(false); setpath(false);ipcRenderer.send('change',{})}}>Choose Directory</h6>
-      :<></>
+    if (digit) {
+      if (Timer) {
+        setTimer(false);
+        document.getElementById('thebtn').classList.remove('stopbtn');
+        document.getElementById('changebtn').classList.remove('dis-dir')
+      } else {
+        setTimer(true);
+        document.getElementById('thebtn').classList.add('stopbtn');
+        document.getElementById('changebtn').classList.add('dis-dir')
+        document.getElementById('notif').classList.add('show');
+        setTimeout(()=>{
+          document.getElementById('notif').classList.remove('show');
+        },2000)
       }
+    } else {
+      alert('Please select a digit first')
+    }
+  }
+  const changedir=(e) => { 
+    if(!e.target.classList.contains('dis-dir')){
+      document.getElementsByClassName('sel')[0].click();
+      document.getElementById('changebtn').classList.remove('dis-dir')
+      setSec(0); 
+      setdigit(false); 
+      setTimer(false); 
+      setpath(false); 
+      ipcRenderer.send('change', {}) 
+    }
+  }
+
+  useEffect(() => {
+    ipcRenderer.on('path', function log(e, data) {
+      let pathdata = 'Your file is saved at ' + data;
+      setpath(pathdata);
+      setdigit(true);
+    })
+
+    return () => {
+      ipcRenderer.removeAllListeners("path");
+    }
+  })
+
+  useEffect(() => {
+    ipcRenderer.on('log', function log(e, data) {
+      console.log(data);
+    })
+    ipcRenderer.on('count', function log(e, data) {
+      setnum(data.count)
+    })
+    return () => {
+      ipcRenderer.removeAllListeners("log");
+      ipcRenderer.removeAllListeners("count");
+    }
+  })
+
+
+  useEffect(() => {
+    let interval = null;
+    if (Timer) {
+      interval = setInterval(() => {
+        if (Timer) {
+          setSec(Sec + 1);
+          let res = Sec % 2
+          if (res === 0) {
+            ipcRenderer.send('save', {})
+          }
+        }
+      }, 1000)
+    } else {
+      // ipcRenderer.send('fetch',{})
+    }
+    return () => {
+      clearInterval(interval);
+    }
+  })
+  return (
+    <>
+      <div className="App button-main-div">
+
+        <div className="all-buttons">
+          <div id='notif' className="notification">
+            <p>Started... </p>
+          </div>
+          <h2>Kunwarsa</h2>
+          <div id='digits' className="digits">
+            <h4 data-digit='12' className='btn startbtn twelve-digit' onClick={sel}>12 Digit</h4>
+            <h4 data-digit='13' className='btn startbtn thirteendigit' onClick={sel}>13 Digit</h4>
+          </div>
+          <button id='thebtn' className='btn startbtn' onClick={start} >{Timer ? 'Stop' : "Start"}</button>
+          {(path && digit && Sec > 2) ?
+            <button className='btn startbtn' onClick={() => { ipcRenderer.send('open', {}) }}>Open file</button>
+            : <></>}
+          {(path && digit && Sec > 2) ?
+            <div className="number-count">
+              <p>Numbers Generated {num}</p>
+            </div>
+            : <></>}
+          <div className="directory-text">
+            <h6 id='path'>{path}</h6>
+            {path ?
+              <h5 id='changebtn' className='btn startbtn ' onClick={changedir}>Choose Directory</h5>
+              : <></>
+            }
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
+
+    </>
   );
 }
 
