@@ -6,15 +6,22 @@ const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const workbook = new Excel.Workbook();
 const worksheet = workbook.addWorksheet('My Sheet');
+let d = new Date(Date.now());
+let srr= d.toDateString().split(' ');
+let filename = srr[2]+' '+srr[1]+' '+srr[3]+' '+srr[0]+ '.xlsx'
+let newfile=true;
 const appname = app.getName();
 let mydata = app.getPath('appData');
 let appDataPath = false
+
+
 
 function createMainWindow() {
     mainWindow = new BrowserWindow({
         width: 400,
         height: 400,
         resizable: false,
+        maximizable:false,
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, 'preload.js')
@@ -39,7 +46,8 @@ app.on('ready', () => {
     } catch (error) {
         mainWindow.webContents.send('log', { error });
     }
-
+    console.log(filename)
+    
 })
 
 let db = new sqlite3.Database(path.join(mydata, appname, 'database.db'), (err) => {
@@ -102,18 +110,38 @@ async function getpathfromuser(){
                 });
             }
         });
+        try {
+            if (fs.existsSync(path.join(appDataPath, filename))) {
+                console.log(
+                    'exists'
+                )
+                   newfile=false
+            }else{
+                console.log('not exitss')
+                worksheet.addRow(["Number"])
+                newfile=true
+            }
+        } catch(err) {
+            console.error(err)
+        }
     }
 }
 
-function insertexcel(number, date) {
-    worksheet.addRow([number, date]);
-    let d = new Date(Date.now());
-    let file = d.toDateString()
-    let name = 'data' + file + '.xlsx'
-    workbook.xlsx.writeFile(path.join(appDataPath, name))
-        .then(function () {
-            console.log('File is written.');
-        });
+function insertexcel(number) {
+    if(newfile){     
+        worksheet.addRow([number]);
+        workbook.xlsx.writeFile(path.join(appDataPath, filename))
+            .then(function () {
+                console.log('File is written.');
+            });
+    }else{
+    workbook.xlsx.readFile(path.join(appDataPath, filename))
+    .then(function() {
+        var oldworksheet = workbook.getWorksheet(1);
+        oldworksheet.addRow([number]);
+        return workbook.xlsx.writeFile(path.join(appDataPath, filename));
+    })
+    }
 }
 
 
@@ -121,7 +149,7 @@ function insertexcel(number, date) {
 
 ipcMain.on('save', () => {
     let Entry = newEntry()
-    insertexcel(Entry.number, Entry.date)
+    insertexcel(Entry.number)
 });
 ipcMain.on('digit', (e, data) => {
     setdigit(data.digit)
@@ -137,6 +165,20 @@ ipcMain.on('checkpath', async (e, data) => {
             if (rows[0]) {
                 appDataPath=rows[0].path
                 mainWindow.webContents.send('path', appDataPath);
+                try {
+                    if (fs.existsSync(path.join(appDataPath, filename))) {
+                        console.log(
+                            'exists'
+                        )
+                           newfile=false
+                    }else{
+                        console.log('not exitss')
+                        worksheet.addRow(["Number"])
+                        newfile=true
+                    }
+                } catch(err) {
+                    console.error(err)
+                }
                 return;
             }else{
                 getpathfromuser()
@@ -151,9 +193,8 @@ ipcMain.on('checkpath', async (e, data) => {
 //     mainWindow.webContents.send('path',appDataPath);
 // })
 ipcMain.on('open', (e, data) => {
-    let d = new Date(Date.now());
-    let file = 'data' + d.toDateString() + '.xlsx'
-    shell.showItemInFolder(path.join(appDataPath,file))
+    
+    shell.showItemInFolder(path.join(appDataPath,filename))
 })
 ipcMain.on('change', async(e, data) => {
     const result = await dialog.showOpenDialog(mainWindow, {

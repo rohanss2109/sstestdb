@@ -22,6 +22,7 @@ function sel(e){
     e.target.classList.remove('sel');
     setdigit(false)
     setTimer(false);
+    document.getElementById('thebtn').classList.remove('stopbtn');
   }
   
 }
@@ -30,8 +31,10 @@ function start(e){
   if(digit){
     if(Timer){
       setTimer(false);
+      document.getElementById('thebtn').classList.remove('stopbtn');
     }else{
       setTimer(true);
+      document.getElementById('thebtn').classList.add('stopbtn');
     }
   }else{
     alert('Please select a digit first')
@@ -81,21 +84,26 @@ return()=>{
 }
 })
   return (
-    <div className="App">
-      <h1>{Sec}</h1>
+    <div className="App button-main-div">
+      
+    <div class="all-buttons">
+    <h2>Kunwarsa</h2>
       <div id='digits' className="digits">
-        <h4 data-digit='12' className='btn' onClick={sel}>12 digit</h4>
-        <h4 data-digit='13' className='btn' onClick={sel}>13 digit</h4>
+        <h4 data-digit='12' className='btn startbtn' onClick={sel}>12 digit</h4>
+        <h4 data-digit='13' className='btn startbtn' onClick={sel}>13 digit</h4>
       </div>
-      <button className='btn' onClick={start} >{Timer?'Stop':"Start"}</button>
+      <button id='thebtn' className='btn startbtn' onClick={start} >{Timer?'Stop':"Start"}</button>
       {(path&&digit&&Sec>2)?
-      <button className='btn' onClick={()=>{ipcRenderer.send('open',{})}}>show file</button>
+      <button className='btn startbtn' onClick={()=>{ipcRenderer.send('open',{})}}>Open file</button>
       :<></>}
+      <div class="directory-text">
       <h6 id='path'>{path}</h6>
       {path?
-      <h6 id='changebtn' className='btn' onClick={()=>{document.getElementsByClassName('sel')[0].click(); setpath(false);ipcRenderer.send('change',{})}}>choose directory</h6>
+      <h6 id='changebtn' className='btn startbtn' onClick={()=>{document.getElementsByClassName('sel')[0].click(); setpath(false);ipcRenderer.send('change',{})}}>choose directory</h6>
       :<></>
       }
+      </div>
+    </div>
     </div>
   );
 }
