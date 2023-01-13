@@ -38,7 +38,7 @@ function createMainWindow() {
 app.on('ready', () => {
     createMainWindow();
     console.log(filename)
-    // Menu.setApplicationMenu(null)
+    Menu.setApplicationMenu(null)
 })
 
 let db = new sqlite3.Database(path.join(mydata, appname, 'database.db'), (err) => {
