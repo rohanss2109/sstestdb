@@ -99,7 +99,7 @@ return()=>{
       <div class="directory-text">
       <h6 id='path'>{path}</h6>
       {path?
-      <h6 id='changebtn' className='btn startbtn' onClick={()=>{document.getElementsByClassName('sel')[0].click(); setpath(false);ipcRenderer.send('change',{})}}>choose directory</h6>
+      <h6 id='changebtn' className='btn startbtn' onClick={()=>{document.getElementsByClassName('sel')[0].click(); setpath(false);ipcRenderer.send('change',{})}}>Choose Directory</h6>
       :<></>
       }
       </div>

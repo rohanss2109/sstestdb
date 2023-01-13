@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, shell, dialog, Menu } = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
 const Excel = require('exceljs');
@@ -21,6 +21,9 @@ function createMainWindow() {
         width: 400,
         height: 400,
         resizable: false,
+        autoHideMenuBar:false,
+        resizable:false,
+        devTools:false,
         maximizable:false,
         webPreferences: {
             nodeIntegration: true,
@@ -36,18 +39,8 @@ function createMainWindow() {
 
 app.on('ready', () => {
     createMainWindow();
-    try {
-        var data = storage.getSync('Data');
-        if (!data.length) {
-            storage.set('Data', [], function (error) {
-                if (error) throw error;
-            });
-        }
-    } catch (error) {
-        mainWindow.webContents.send('log', { error });
-    }
     console.log(filename)
-    
+    Menu.setApplicationMenu(null)
 })
 
 let db = new sqlite3.Database(path.join(mydata, appname, 'database.db'), (err) => {
