@@ -22,7 +22,6 @@ function createMainWindow() {
         height: 400,
         resizable: false,
         autoHideMenuBar:false,
-        resizable:false,
         devTools:false,
         maximizable:false,
         webPreferences: {
@@ -85,6 +84,7 @@ function newEntry() {
     return { number: num, date: date };
 }
 async function getpathfromuser(){
+    newfile=true
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory']
     })
@@ -190,12 +190,13 @@ ipcMain.on('open', (e, data) => {
     shell.showItemInFolder(path.join(appDataPath,filename))
 })
 ipcMain.on('change', async(e, data) => {
+    newfile=true
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory']
     })
     if (result.filePaths.length > 0) {
         appDataPath = result.filePaths[0];
-        mainWindow.webContents.send('path', appDataPath);
+        // mainWindow.webContents.send('path', appDataPath);
         db.serialize(async () => {
             if (appDataPath) {
                 let qry = `UPDATE pathdata SET path='${appDataPath}';`
