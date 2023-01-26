@@ -10,6 +10,7 @@ let d = new Date(Date.now());
 let srr= d.toDateString().split(' ');
 let filename = srr[2]+' '+srr[1]+' '+srr[3]+' '+srr[0]+ '.xlsx'
 let newfile=true;
+let currentcolumn = 1;
 const appname = app.getName();
 let mydata = app.getPath('appData');
 let appDataPath = false
@@ -106,7 +107,30 @@ async function getpathfromuser(){
                 console.log(
                     'exists'
                 )
-                   newfile=false
+                newfile=false
+                workbook.xlsx.readFile(path.join(appDataPath, filename))
+                .then(function() {
+                    let oldworksheet = workbook.getWorksheet(1);
+                    let columnCount = oldworksheet.getColumnCount();
+                    let lastColumn = 0;
+                    for (var i = columnCount; i >= 1; i--) {
+                        var hasContent = false;
+                        var rowCount = oldworksheet.getRowCount();
+                        for (var j = 1; j <= rowCount; j++) {
+                            var cell = oldworksheet.getCell(j, i);
+                            if (cell.getValue() != null) {
+                                hasContent = true;
+                                break;
+                            }
+                        }
+                        if (hasContent) {
+                            lastColumn = i;
+                            break;
+                        }
+                    }
+                    currentcolumn=lastColumn
+                })
+                   
             }else{
                 console.log('not exitss')
                 worksheet.addRow(["Number"])
@@ -126,12 +150,57 @@ function insertexcel(number) {
                 mainWindow.webContents.send('saved',{})
             });
     }else{
-    workbook.xlsx.readFile(path.join(appDataPath, filename))
-    .then(function() {
-        var oldworksheet = workbook.getWorksheet(1);
-        oldworksheet.addRow([number]);
-        return workbook.xlsx.writeFile(path.join(appDataPath, filename));
-    })
+        try {
+            workbook.xlsx.readFile(path.join(appDataPath, filename))
+            .then(function() {
+                let oldworksheet = workbook.getWorksheet(1);
+                // oldworksheet.addRow([number]);
+                let rowCount = oldworksheet.rowCount;
+                let lastRow = 0;
+
+                for (let i = 1; i <= rowCount; i++) {
+                    let row = oldworksheet.getRow(i);
+                    if (row) {
+                        let cell = row.getCell(currentcolumn);
+                        if (cell.value != null) {
+                            lastRow++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                if (lastRow === 1001) {
+                    currentcolumn++;
+                    oldworksheet.getRow(1).getCell(currentcolumn).value = 'Number';
+                    oldworksheet.getRow(2).getCell(currentcolumn).value = number;
+                }else{
+                    oldworksheet.getRow(lastRow+1).getCell(currentcolumn).value = number;
+                }
+
+
+                let allrows = oldworksheet.actualRowCount;
+                let cellsWithContent = 0;//getting numbers generated
+                for (let i = 1; i <= allrows; i++) {
+                    for (let j = 1; j <= currentcolumn; j++) {
+                        let row = oldworksheet.getRow(i);
+                        if(row) {
+                            let cell = row.getCell(j);
+                            if (cell.value != null) {
+                                cellsWithContent++;
+                            }
+                        }
+                    }
+                }
+                mainWindow.webContents.send('count',{count:cellsWithContent-currentcolumn})
+
+                
+                return workbook.xlsx.writeFile(path.join(appDataPath, filename));
+            })
+        } catch (error) {
+            console.log(error)
+        }
+
     }
 }
 
@@ -143,7 +212,7 @@ ipcMain.on('save', () => {
         if (fs.existsSync(path.join(appDataPath, filename))) {
                newfile=false
         }else{
-            worksheet.addRow(["Number"])
+            // worksheet.addRow(["Number"])
             newfile=true
         }
     } catch(err) {
@@ -151,11 +220,6 @@ ipcMain.on('save', () => {
     }
     let Entry = newEntry()
     insertexcel(Entry.number)
-    workbook.xlsx.readFile(path.join(appDataPath, filename))
-    .then(function() {
-        var oldworksheet = workbook.getWorksheet(1);
-        mainWindow.webContents.send('count',{count:oldworksheet.rowCount})
-    })
 });
 ipcMain.on('digit', (e, data) => {
     setdigit(data.digit)
@@ -177,6 +241,28 @@ ipcMain.on('checkpath', async (e, data) => {
                             'exists'
                         )
                            newfile=false
+                           workbook.xlsx.readFile(path.join(appDataPath, filename))
+                           .then(function() {
+                               let oldworksheet = workbook.getWorksheet(1);
+                               let columnCount = oldworksheet.getColumnCount();
+                               let lastColumn = 0;
+                               for (var i = columnCount; i >= 1; i--) {
+                                   var hasContent = false;
+                                   var rowCount = oldworksheet.getRowCount();
+                                   for (var j = 1; j <= rowCount; j++) {
+                                       var cell = oldworksheet.getCell(j, i);
+                                       if (cell.getValue() != null) {
+                                           hasContent = true;
+                                           break;
+                                       }
+                                   }
+                                   if (hasContent) {
+                                       lastColumn = i;
+                                       break;
+                                   }
+                               }
+                               currentcolumn=lastColumn
+                           })
                     }else{
                         console.log('not exitss')
                         worksheet.addRow(["Number"])
