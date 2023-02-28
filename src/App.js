@@ -10,22 +10,35 @@ function App() {
   const [digit, setdigit] = useState(false);
 
   function sel(e) {
-    if (!e.target.classList.contains('sel')) {
-      ipcRenderer.send('checkpath', {});
-      let digiti = parseInt(e.target.dataset.digit);
-      ipcRenderer.send('digit', { digit: digiti })
-      for (let i = 0; i < e.target.closest('.digits').children.length; i++) {
-        const element = e.target.closest('.digits').children[i];
-        element.classList.remove('sel');
+    for (let i = 0; i < e.target.closest('.digits').children.length; i++) {
+      const element = e.target.closest('.digits').children[i];
+      if(element.classList.contains('sel')){
+        if(!window.confirm('Are you sure???')){
+          return;
+        }
       }
-      e.target.classList.add('sel');
-    } else {
-      e.target.classList.remove('sel');
-      setdigit(false)
-      setTimer(false);
-      document.getElementById('thebtn').classList.remove('stopbtn');
-      document.getElementById('changebtn').classList.remove('dis-dir')
+      
     }
+      if (!e.target.classList.contains('sel')) {
+        setTimer(false);
+        setSec(0)
+        document.getElementById('thebtn').classList.remove('stopbtn');
+        ipcRenderer.send('checkpath', {});
+        let digiti = parseInt(e.target.dataset.digit);
+        ipcRenderer.send('digit', { digit: digiti })
+        for (let i = 0; i < e.target.closest('.digits').children.length; i++) {
+          const element = e.target.closest('.digits').children[i];
+          element.classList.remove('sel');
+        }
+        e.target.classList.add('sel');
+      } else {
+        e.target.classList.remove('sel');
+        setdigit(false)
+        setTimer(false);
+        document.getElementById('thebtn').classList.remove('stopbtn');
+        document.getElementById('changebtn').classList.remove('dis-dir')
+      }
+    
 
   }
   function start(e) {
@@ -130,6 +143,7 @@ function App() {
           {(path && digit && Sec > 2) ?
             <div className="number-count">
               <p>Numbers Generated {num}</p>
+            <h5 onClick={()=>{ipcRenderer.send('download', {})}} className='btn startbtn ' >download</h5>
             </div>
             : <></>}
           <div className="directory-text">
