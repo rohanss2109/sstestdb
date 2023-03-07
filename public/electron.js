@@ -235,22 +235,26 @@ async function setdigit(data) {
 }
 function newEntry() {
     let num = null;
+    const d = new Date();
     if (digit === 13) {
         // let timestamp = Math.floor(Date.now() / 1000);
         // timestamp = timestamp.toString().padStart(6, '0');
         // if(series===9999){
         //     series=0
         // }
+        
+        num= Math.floor((Math.random()*99)).toString().padStart(2,'0')+d.getDate().toString().padStart(2,'0')+d.getMonth().toString().padStart(2,'0')+d.getFullYear().toString().slice(2,4)+Math.floor((Math.random()*9)).toString().padStart(1,'0')+ipno+Math.floor((Math.random()*9)).toString().padStart(1,'0')
         // num=timestamp+ipno+series.toString().padStart(4,0);
-        num = Math.floor((Math.random()*10000000000000)).toString().padStart(13,'0');
+        // num = Math.floor((Math.random()*10000000000000)).toString().padStart(13,'0');
     } else {
         // let timestamp = Math.floor(Date.now() / 1000);
         // timestamp = timestamp.toString().padStart(5, '0');
         // if(series===9999){
         //     series=0
         // }
+            num = Math.floor((Math.random()*9)).toString().padStart(1,'0')+d.getDate().toString().padStart(2,'0')+d.getMonth().toString().padStart(2,'0')+d.getFullYear().toString().slice(2,4)+Math.floor((Math.random()*9)).toString().padStart(1,'0')+ipno+Math.floor((Math.random()*9)).toString().padStart(1,'0')
         // num=timestamp+ipno+series.toString().padStart(4,0);
-        num = Math.floor((Math.random()*1000000000000)).toString().padStart(12,'0');
+        // num = Math.floor((Math.random()*1000000000000)).toString().padStart(12,'0');
     }
     series=series+1;
     let date = Date.now();
